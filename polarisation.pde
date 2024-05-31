@@ -5,14 +5,14 @@ PGraphics plotWindow;
 int numPoints = 150; // Number of points to plot the wave
 float waveLength = 100; // Wavelength
 float waveFrequency = 0.02; // Frequency of the wave
-float phaseShift = PI / 2; // Phase shift between E and B fields
+float phaseShift = PI / 2; // Phase shift between Ex and Ey fields
 float angle = 0; // Initial angle for animation
 float camAngleX = 0; // Camera angle in the X direction
 float camAngleY = 0; // Camera angle in the Y direction
 float camRadius = 500; // Camera distance from the origin
 float arrowSize = 2; // Size of the arrowhead
-int electricTransparency = 255; // Transparency for electric field
-int magneticTransparency = 255; // Transparency for magnetic field
+int ExTransparency = 255; // Transparency for Ex field
+int EyTransparency = 255; // Transparency for Ey field
 int resultantTransparency = 255;
 float zoomFactor = 1; // Zoom factor
 int plotWindowWidth = 800; // Width of the plot window
@@ -24,21 +24,21 @@ void setup() {
 
   cp5 = new ControlP5(this);
   
-  cp5.addSlider("electricTransparency")
+  cp5.addSlider("ExTransparency")
      .setSize(120, 20)
      .setPosition(900, 200)
      .setRange(1, 255)
      .setValue(255)
      .setNumberOfTickMarks(24) // Add tick marks
-     .setLabel("Electric Transparency"); // Name for the slider
+     .setLabel("ExTransparency"); // Name for the slider
      
-  cp5.addSlider("magneticTransparency")
+  cp5.addSlider("EyTransparency")
      .setPosition(900, 400)
      .setSize(120, 20)
      .setRange(1, 255)
      .setValue(255)
      .setNumberOfTickMarks(24) // Add tick marks
-     .setLabel("Magnetic Transparency"); // Name for the slider
+     .setLabel("EyTransparency"); // Name for the slider
      
   cp5.addSlider("resultantTransparency")
      .setPosition(900, 600)
@@ -113,20 +113,20 @@ void drawAxes() {
 void drawWave() {
   plotWindow.strokeWeight(2);
   
-  // Electric field (Red) - along Y-axis
-  plotWindow.stroke(255, 0, 0, electricTransparency);
+  // Electric field Y (Red) - along Y-axis
+  plotWindow.stroke(255, 0, 0, EyTransparency);
   for (int i = 0; i < numPoints; i++) {
     float z = map(i, 0, numPoints, -200, 200);
     float y = 50 * sin(TWO_PI * (z / waveLength) + angle);
-    drawArrow(0, 0, z, 0, y, z, arrowSize,color(255, 0, 0, electricTransparency));
+    drawArrow(0, 0, z, 0, y, z, arrowSize,color(255, 0, 0, EyTransparency));
   }
   
-  // Magnetic field (Blue) - along X-axis
-  plotWindow.stroke(0, 0, 255, magneticTransparency);
+  // Electric Field X (Blue) - along X-axis
+  plotWindow.stroke(0, 0, 255, ExTransparency);
   for (int i = 0; i < numPoints; i++) {
     float z = map(i, 0, numPoints, -200, 200);
     float x = 50 * sin(TWO_PI * (z / waveLength) + angle + phaseShift);
-    drawArrow(0, 0, z, x, 0, z, arrowSize,color(0, 0, 255,magneticTransparency));
+    drawArrow(0, 0, z, x, 0, z, arrowSize,color(0, 0, 255,ExTransparency));
   }
   
   // Resultant wave (Magenta) - sum of electric and magnetic fields
