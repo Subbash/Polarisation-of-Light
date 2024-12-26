@@ -9,7 +9,7 @@ float phaseShift = PI / 2; // Phase shift between Ex and Ey fields
 float angle = 0; // Initial angle for animation
 float camAngleX = 0; // Camera angle in the X direction
 float camAngleY = 0; // Camera angle in the Y direction
-float camRadius = 500; // Camera distance from the origin
+float camRadius = 100; // Camera distance from the origin
 float arrowSize = 2; // Size of the arrowhead
 int ExTransparency = 255; // Transparency for Ex field
 int EyTransparency = 255; // Transparency for Ey field
@@ -22,24 +22,45 @@ void setup() {
   size(1800, 1000, P3D);
   plotWindow = createGraphics(plotWindowWidth, plotWindowHeight, P3D);
 
+  surface.setTitle("Demo of Polarisation"); // Set the title of the window
+
   cp5 = new ControlP5(this);
-  
+
+  // Title for side control bars
+  cp5.addTextlabel("title1")
+     .setText("Control Panel - Ex Transparency")
+     .setPosition(850, 170)
+     .setColorValue(color(0))
+     .setFont(createFont("Arial", 16));
+
   cp5.addSlider("ExTransparency")
      .setSize(120, 20)
      .setPosition(900, 200)
      .setRange(1, 255)
      .setValue(255)
      .setNumberOfTickMarks(24) // Add tick marks
-     .setLabel("ExTransparency"); // Name for the slider
-     
+     .setLabel("Ex Transparency"); // Name for the slider
+
+  cp5.addTextlabel("title2")
+     .setText("Control Panel - Ey Transparency")
+     .setPosition(850, 370)
+     .setColorValue(color(0))
+     .setFont(createFont("Arial", 16));
+
   cp5.addSlider("EyTransparency")
      .setPosition(900, 400)
      .setSize(120, 20)
      .setRange(1, 255)
      .setValue(255)
      .setNumberOfTickMarks(24) // Add tick marks
-     .setLabel("EyTransparency"); // Name for the slider
-     
+     .setLabel("Ey Transparency"); // Name for the slider
+
+  cp5.addTextlabel("title3")
+     .setText("Control Panel - Resultant Transparency")
+     .setPosition(850, 570)
+     .setColorValue(color(0))
+     .setFont(createFont("Arial", 16));
+
   cp5.addSlider("resultantTransparency")
      .setPosition(900, 600)
      .setSize(120, 20)
@@ -47,7 +68,13 @@ void setup() {
      .setValue(255)
      .setNumberOfTickMarks(24) // Add tick marks
      .setLabel("Resultant Transparency"); // Name for the slider
-  
+
+  cp5.addTextlabel("title4")
+     .setText("Control Panel - Phase Shift")
+     .setPosition(850, 770)
+     .setColorValue(color(0))
+     .setFont(createFont("Arial", 16));
+
   // Add slider for controlling phase of the second wave
   cp5.addSlider("phaseShift")
      .setPosition(900, 800)
@@ -64,23 +91,23 @@ void draw() {
   plotWindow.background(255);
   plotWindow.lights();
   plotWindow.strokeWeight(2);
-  
+
   // Camera position based on mouse movement and zoom factor
   float camX = camRadius * cos(camAngleY) * sin(camAngleX) / zoomFactor;
   float camY = camRadius * sin(camAngleY) / zoomFactor;
   float camZ = camRadius * cos(camAngleY) * cos(camAngleX) / zoomFactor;
-  
+
   // Set the camera position
   plotWindow.camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
-  
+
   drawAxes();
   drawWave();
-  
+
   plotWindow.endDraw();
   image(plotWindow, 50, 50);
-  
+
   angle += waveFrequency;
-  
+
   // Calculate the distance between camera and origin
   float distance = dist(0, 0, 0, camX, camY, camZ);
   // Adjust zoom factor based on distance
@@ -89,30 +116,30 @@ void draw() {
 
 void drawAxes() {
   plotWindow.strokeWeight(1);
-  
+
   // Z-axis (Direction of propagation)
   plotWindow.stroke(0);
   plotWindow.line(0, 0, -200, 0, 0, 200);
-  
+
   // X-axis
-  plotWindow.stroke(255, 0, 0);
-  plotWindow.line(-200, 0, 0, 200, 0, 0);
-  
-  // Y-axis
   plotWindow.stroke(0, 0, 255);
+  plotWindow.line(-200, 0, 0, 200, 0, 0);
+
+  // Y-axis
+  plotWindow.stroke(255, 0, 0);
   plotWindow.line(0, -200, 0, 0, 200, 0);
-  
+
   // Labels
-  plotWindow.textSize(12);
+  plotWindow.textSize(16); // Increase font size
   plotWindow.fill(0);
-  plotWindow.text("z", 0, 0, 210); // Label for Z-axis
-  plotWindow.text("x", 210, 0, 0); // Label for X-axis
-  plotWindow.text("y", 0, 210, 0); // Label for Y-axis
+  plotWindow.text("Z-axis (Propagation Direction)", 10, -10, 210); // Label for Z-axis
+  plotWindow.text("X-axis (Electric Field X)", 210, 0, 0); // Label for X-axis
+  plotWindow.text("Y-axis (Electric Field Y)", 0, 210, 0); // Label for Y-axis
 }
 
 void drawWave() {
   plotWindow.strokeWeight(2);
-  
+
   // Electric field Y (Red) - along Y-axis
   plotWindow.stroke(255, 0, 0, EyTransparency);
   for (int i = 0; i < numPoints; i++) {
@@ -120,7 +147,7 @@ void drawWave() {
     float y = 50 * sin(TWO_PI * (z / waveLength) + angle);
     drawArrow(0, 0, z, 0, y, z, arrowSize,color(255, 0, 0, EyTransparency));
   }
-  
+
   // Electric Field X (Blue) - along X-axis
   plotWindow.stroke(0, 0, 255, ExTransparency);
   for (int i = 0; i < numPoints; i++) {
@@ -128,7 +155,7 @@ void drawWave() {
     float x = 50 * sin(TWO_PI * (z / waveLength) + angle + phaseShift);
     drawArrow(0, 0, z, x, 0, z, arrowSize,color(0, 0, 255,ExTransparency));
   }
-  
+
   // Resultant wave (Magenta) - sum of electric and magnetic fields
   plotWindow.stroke(0, 0, 0, resultantTransparency);
   for (int i = 0; i < numPoints; i++) {
@@ -143,25 +170,25 @@ void drawArrow(float x1, float y1, float z1, float x2, float y2, float z2, float
   // Draw the main line of the arrow
   plotWindow.line(x1, y1, z1, x2, y2, z2);
   plotWindow.stroke(arrowColor);
-  
+
   // Calculate the direction of the arrow
   float dx = x2 - x1;
   float dy = y2 - y1;
   float dz = z2 - z1;
-  
+
   // Normalize the direction
   float len = dist(x1, y1, z1, x2, y2, z2);
   dx /= len;
   dy /= len;
   dz /= len;
-  
+
   // Calculate points for the arrowhead
   float arrowX = x2 - dx * size;
   float arrowY = y2 - dy * size;
   float arrowZ = z2 - dz * size;
-  
+
   plotWindow.fill(arrowColor);
-  
+
   plotWindow.beginShape(TRIANGLES);
   plotWindow.vertex(x2, y2, z2);
   plotWindow.vertex(arrowX + dy * size * 0.5, arrowY - dx * size * 0.5, arrowZ);
